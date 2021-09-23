@@ -1,0 +1,25 @@
+{
+  "name": "healthy-recepies-backend",
+  "version": "1.0.0",
+  "description": "API for healthy recepies",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gildardo37/healthy-recepies-backend.git"
+  },
+  "author": "Gildardo Diaz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gildardo37/healthy-recepies-backend/issues"
+  },
+  "homepage": "https://github.com/gildardo37/healthy-recepies-backend#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql2": "^2.3.0",
+    "nodemon": "^2.0.12",
+    "sequelize": "^6.6.5"
+  }
+}
