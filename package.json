@@ -18,6 +18,7 @@
   "homepage": "https://github.com/gildardo37/healthy-recepies-backend#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.0",
     "sequelize": "^6.6.5"
   }
