@@ -19,10 +19,7 @@ exports.login = async (req, res) => {
     try {
         const query = await USER.findOne({
             attributes: [ 'id_user', 'email', 'name'],
-            where: { 
-                email: req.body.email,
-                password: req.body.password
-            }
+            where: {  email: req.body.email, password: req.body.password }
         })
 
         if(query == null){
@@ -44,7 +41,7 @@ exports.login = async (req, res) => {
     }
 }
 
-//reghister a user
+//register a user
 exports.registerUser = async (req, res) => {
     try {
         const verifyEmail = await userExists(req.body.email);
@@ -89,8 +86,7 @@ exports.profile = async (req, res) => {
     }
 };
 
-
-//reghister a user
+//register a user
 exports.updateUser = async (req, res) => {
     try {
         const user_data = {

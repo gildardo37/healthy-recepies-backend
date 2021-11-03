@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const db = require("./app/config/db.connection");
 require("./app/models/associations");
-const router = express.Router()
 
 
 app.use(express.json({limit: '50mb'}));
