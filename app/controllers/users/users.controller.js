@@ -10,7 +10,8 @@ exports.getUsers = async (req, res) => {
         res.send({ data: data, status: 0 });
     } 
     catch (error) {
-        res.status(500).send( { message: error.message || "Some error occurred while retrieving users.", status: 1});
+        console.log(error);
+        res.status(500).send( { message: "Some error occurred while retrieving users.", status: 1 });
     }
 };
 
@@ -18,7 +19,7 @@ exports.getUsers = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const query = await USER.findOne({
-            attributes: [ 'id_user', 'email', 'name'],
+            attributes: [ 'id_user', 'email', 'name' ],
             where: {  email: req.body.email, password: req.body.password }
         })
 
@@ -33,11 +34,11 @@ exports.login = async (req, res) => {
             name: query.name
         }
 
-        const data = await TOKEN.create(token_data, "1h");
+        const data = await TOKEN.create(token_data, "5d");
         res.send( { token: data } );
     }
     catch (error) {
-        res.status(500).send( { message: error.message || "Some error occurred while retrieving users.", status: 1});
+        res.status(500).send( { message: "Some error occurred while retrieving users.", status: 1});
     }
 }
 
@@ -45,11 +46,7 @@ exports.login = async (req, res) => {
 exports.registerUser = async (req, res) => {
     try {
         const verifyEmail = await userExists(req.body.email);
-        console.log(verifyEmail);
-        if(verifyEmail){
-            res.send( { message: "This email already exists, please use another email." , status: 0});
-            return;
-        } 
+        if(verifyEmail) return res.send( { message: "This email already exists, please use another email." , status: 1 });
         
         const user_data = {
             name: req.body.name,
@@ -61,11 +58,15 @@ exports.registerUser = async (req, res) => {
             gender: req.body.gender
         };
         const data = await USER.create(user_data);
-        if(data.dataValues) res.send( { message: "User registered correctly! You can now login." , status: 1 });
-        else res.send({ message: "Some error occurred while creating this user." , status: 0 });
+        if(data.dataValues){
+            const req = { body: { password: user_data.password, email: user_data.email } }
+            this.login(req, res);
+        } 
+        else res.send({ message: "Some error occurred while creating this user. Try again." , status: 1 });
     } 
     catch (error) {
-        res.status(500).send( { message: error.message || "Some error occurred while creating this user.", status: 1 });
+        console.log(error);
+        res.status(500).send( { message: "Some error occurred while creating this user. Try again.", status: 1 });
     }
 }
 
@@ -86,7 +87,7 @@ exports.profile = async (req, res) => {
     }
 };
 
-//register a user
+//updates a user
 exports.updateUser = async (req, res) => {
     try {
         const user_data = {
@@ -104,21 +105,23 @@ exports.updateUser = async (req, res) => {
         }
         const data = await USER.update(user_data, filter);
         console.log(data);
-        if(data[0] != 0) res.send( { message: "User updated correctly!" , status: 1 });
-        else res.send({ message: "Some error occurred while updating this user." , status: 0 });
+        if(data[0] != 0) res.send( { message: "User updated correctly!" , status: 0 });
+        else res.send({ message: "Some error occurred while updating this user." , status: 1 });
     } 
     catch (error) {
-        res.status(500).send( { message: error.message || "Some error occurred while updating this user.", status: 1 });
+        console.log(error);
+        res.status(500).send( { message: "Some error occurred while updating this user.", status: 1 });
     }
 }
 
 const userExists = async (email) => {
     try {
-        const data = await User.findOne({where: { email: email } });
+        const data = await USER.findOne({ where: { email } });
         if(data) return data.dataValues
         return false;
     } 
     catch (error) {
         console.log(error);
+        return false;
     }
 }
