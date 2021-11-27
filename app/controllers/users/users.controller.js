@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
         })
 
         if(query == null){
-            res.send({ message: "Wrong user or password, try again.", status: 1 });
+            res.status(404).send({ message: "Wrong user or password, try again.", status: 1 });
             return;
         }
 
@@ -46,7 +46,7 @@ exports.login = async (req, res) => {
 exports.registerUser = async (req, res) => {
     try {
         const verifyEmail = await userExists(req.body.email);
-        if(verifyEmail) return res.send( { message: "This email already exists, please use another email." , status: 1 });
+        if(verifyEmail) return res.status(404).send( { message: "This email already exists, please use another email." , status: 1 });
         
         const user_data = {
             name: req.body.name,
@@ -62,7 +62,7 @@ exports.registerUser = async (req, res) => {
             const req = { body: { password: user_data.password, email: user_data.email } }
             this.login(req, res);
         } 
-        else res.send({ message: "Some error occurred while creating this user. Try again." , status: 1 });
+        else res.status(404).send({ message: "Some error occurred while creating this user. Try again." , status: 1 });
     } 
     catch (error) {
         console.log(error);
@@ -79,7 +79,7 @@ exports.profile = async (req, res) => {
         }
         const data = await USER.findOne(filter);
 
-        if(data === null) res.send({ message: "This user doesn't exists or you don't have permission to this information.", status: 1 });
+        if(data === null) res.status(404).send({ message: "This user doesn't exists or you don't have permission to this information.", status: 1 });
         res.send({ data: data, status: 0 });
     } 
     catch (error) {
@@ -106,7 +106,7 @@ exports.updateUser = async (req, res) => {
         const data = await USER.update(user_data, filter);
         console.log(data);
         if(data[0] != 0) res.send( { message: "User updated correctly!" , status: 0 });
-        else res.send({ message: "Some error occurred while updating this user." , status: 1 });
+        else res.status(404).send({ message: "Some error occurred while updating this user." , status: 1 });
     } 
     catch (error) {
         console.log(error);
