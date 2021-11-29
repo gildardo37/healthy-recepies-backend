@@ -1,12 +1,19 @@
 const TOKEN = require("../../_shared/token");
 const DB = require("../../config/db.connection");
 const USER = DB.users;
+const HEALTH = DB.health;
 const OP = DB.Sequelize.Op;
 
 //get all users
 exports.getUsers = async (req, res) => {
     try {
-        const data = await USER.findAll();
+        const data = await USER.findAll({
+            attributes: ['id_user', 'name', 'password', 'age', 'height', 'weight', 'gender'],
+            include: {
+                model: HEALTH,
+                attributes: ['calories', 'imc']
+            }
+        });
         res.send({ data: data, status: 0 });
     } 
     catch (error) {
@@ -45,23 +52,24 @@ exports.login = async (req, res) => {
 //register a user
 exports.registerUser = async (req, res) => {
     try {
-        const verifyEmail = await userExists(req.body.email);
-        if(verifyEmail) return res.status(404).send( { message: "This email already exists, please use another email." , status: 1 });
-        
-        const user_data = {
+        const verify_email = await userExists(req.body.email);
+        if(verify_email) return res.status(404).send( { message: "This email already exists, please use another email." , status: 1 });
+
+        const health = await insertHealth(req.body, res);
+        if(!health) return res.status(404).send({ message: "Some error occurred while creating this user. Try again." , status: 1 });
+
+        const data = await USER.create({
             name: req.body.name,
             password: req.body.password,
             email: req.body.email,
             age: req.body.age,
             height: req.body.height,
             weight: req.body.weight,
-            gender: req.body.gender
-        };
-        const data = await USER.create(user_data);
-        if(data.dataValues){
-            const req = { body: { password: user_data.password, email: user_data.email } }
-            this.login(req, res);
-        } 
+            gender: req.body.gender,
+            fk_health: health.id_health
+        });
+
+        if(data.dataValues) this.login({ body: { password: data.password, email: data.email } }, res); 
         else res.status(404).send({ message: "Some error occurred while creating this user. Try again." , status: 1 });
     } 
     catch (error) {
@@ -123,5 +131,36 @@ const userExists = async (email) => {
     catch (error) {
         console.log(error);
         return false;
+    }
+}
+
+const insertHealth = async (params, res) => {
+    try {
+        const health = await HEALTH.create({
+            calories: calculateCalories(params),
+            imc: caluclateImc(params.height, params.weight)
+        })
+
+        if(health) return health;
+        return false;
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).send( { message: "Some error occurred while creating this user. Try again.", status: 1 });
+    }
+}
+
+const caluclateImc = (height, weight) => {
+    height = parseFloat(height) / 100;
+    return parseFloat(weight) / (parseFloat(height) * parseFloat(height));
+}
+
+const calculateCalories = (params) => {
+    const { weight, height, age, gender } = params;
+    if(gender.toLowerCase() === "male"){
+        return ( 66 + (13.7 * weight)) + ( ((5 * height) - (6.8 * age)) * 1.55 );
+    }
+    else{
+        return ( 655 + (9.6 * weight)) + ( ((1.8 * height) - (4.7 * age)) * 1.55 );
     }
 }

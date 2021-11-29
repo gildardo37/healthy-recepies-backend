@@ -23,6 +23,9 @@ db.connection = connection;
 
 //Require models
 db.users = require("../models/users/users.model")(connection, Sequelize);
+db.my_meals = require("../models/my_meals/my_meals.model")(connection, Sequelize);
+db.meals = require("../models/meals/meals.model")(connection, Sequelize);
+db.health = require("../models/health/health.model")(connection, Sequelize);
 
 //export DB
 module.exports = db;

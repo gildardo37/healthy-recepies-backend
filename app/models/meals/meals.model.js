@@ -2,47 +2,39 @@ const Sequelize = require("sequelize");
 const connection  = require("../../config/db.connection");
 
 module.exports = (connection, Sequelize) => {
-    const users = connection.define("users", {
-        id_user: {
+    const meals = connection.define("meals", {
+        id_meal: {
             type: Sequelize.INTEGER,
             primaryKey: true,
             autoIncrement: true,
             allowNull: false
         },
-        name: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        email: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        password: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        age: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        height: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        weight: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        gender: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        fk_health: {
+        id: {
             type: Sequelize.INTEGER,
             allowNull: false
-        }
+        },
+        title: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        ready_in_minutes: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        image: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        servings: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        fk_my_meal: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
     },
     { timestamps: false });
 
-    return users;
+    return meals;
 };
