@@ -8,7 +8,7 @@ const OP = DB.Sequelize.Op;
 exports.getUsers = async (req, res) => {
     try {
         const data = await USER.findAll({
-            attributes: ['id_user', 'name', 'password', 'age', 'height', 'weight', 'gender'],
+            attributes: ['id_user', 'email','name', 'password', 'age', 'height', 'weight', 'gender'],
             include: {
                 model: HEALTH,
                 attributes: ['calories', 'imc']
