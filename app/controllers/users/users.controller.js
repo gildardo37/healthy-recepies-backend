@@ -82,10 +82,14 @@ exports.registerUser = async (req, res) => {
 exports.profile = async (req, res) => {
     try {
         const token_info = TOKEN.tokenInfo(req, res);
-        const filter = { 
+        const data = await USER.findOne({ 
+            attributes: ['id_user', 'email','name', 'password', 'age', 'height', 'weight', 'gender'],
+            include: {
+                model: HEALTH,
+                attributes: ['calories', 'imc']
+            },
             where: { id_user: token_info.id_user } 
-        }
-        const data = await USER.findOne(filter);
+        });
 
         if(data === null) res.status(404).send({ message: "This user doesn't exists or you don't have permission to this information.", status: 1 });
         res.send({ data: data, status: 0 });

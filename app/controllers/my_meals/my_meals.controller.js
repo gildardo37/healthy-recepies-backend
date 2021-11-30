@@ -63,7 +63,7 @@ const insertMyMeal = async (req, res) => {
                     title: meal.title,
                     ready_in_minutes: meal.readyInMinutes,
                     servings: meal.servings,
-                    image: `${meal.sourceUrl}.${meal.imageType}`,
+                    image: meal.sourceUrl,
                     fk_my_meal: data_my_meal.id_my_meal
                 })
             })
