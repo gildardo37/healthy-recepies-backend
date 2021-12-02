@@ -9,4 +9,9 @@ router.get("/getAll", token.verify, my_meals.getMyMeals);
 //create meal
 router.post("/createMeal", token.verify, my_meals.createMeal);
 
+//get meals from 3rd API
+router.get("/getMeals", my_meals.getRandomMeal);
+
+router.delete("/deleteMeal/:id_meal", my_meals.deleteMeal);
+
 module.exports = router;

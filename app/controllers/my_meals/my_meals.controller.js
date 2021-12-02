@@ -1,9 +1,9 @@
 const TOKEN = require("../../_shared/token");
 const DB = require("../../config/db.connection");
-const { meals } = require("../../config/db.connection");
 const MY_MEALS = DB.my_meals;
 const MEALS = DB.meals;
 const OP = DB.Sequelize.Op;
+const axios = require('axios').default;
 
 //get my meals
 exports.getMyMeals = async (req, res) => {
@@ -11,7 +11,7 @@ exports.getMyMeals = async (req, res) => {
         const token_info = TOKEN.tokenInfo(req, res);
 
         const meal_data = { 
-            attributes: ['calories', 'protein', 'carbohydrates', 'fat', 'date' ],
+            attributes: [['id_my_meal', 'id_meal'], 'calories', 'protein', 'carbohydrates', 'fat', 'date' ],
             include: {
                 model: MEALS,
                 attributes: ['id', 'title', 'ready_in_minutes', 'image', 'servings'  ],
@@ -77,5 +77,45 @@ const insertMyMeal = async (req, res) => {
     catch (error) {
         console.log(error);
         return res.status(500).send( { message: error.message || "Some error occurred while retrieving your meals.", status: 1 });
+    }
+};
+
+exports.getRandomMeal = async (req, res) => {
+    try {
+        const data = {
+            method: 'GET',
+            url: 'https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/mealplans/generate',
+            params: { targetCalories: '2233.72', timeFrame: 'day' },
+            headers: {
+                'x-rapidapi-host': 'spoonacular-recipe-food-nutrition-v1.p.rapidapi.com',
+                'x-rapidapi-key': 'db42bd4e2cmsh79e67a7437d6e45p1b9c09jsn8de802a6c63e'
+            }
+        };
+        const response = await axios.request(data);
+        res.send(response.data)
+
+    } catch (error) {
+        return res.status(500).send( { message: error.message || "Some error occurred while retrieving your meals.", status: 1 });
+    }
+}
+
+//create meal
+exports.deleteMeal = async (req, res) => {
+    try {
+        const { id_meal } = req.params;
+        const all_meals = await MEALS.destroy({ where: { fk_my_meal: id_meal } });
+
+        if(all_meals === 0){
+            return res.status(500).send({ message: "Couldn't delete this meal, please try again ", status: 1 });
+        }
+        
+        const my_meal = await MY_MEALS.destroy({ where: { id_my_meal: id_meal } });
+        
+        if(my_meal !== 0) res.send({ message: "Meal deleted successfully", status: 0 });
+        else res.status(500).send({ message: "Couldn't delete this meal, please try again ", status: 1 });
+    } 
+    catch (error) {
+        console.log(error);
+        res.status(500).send( { message: error.message || "Some error occurred while retrieving your meals.", status: 1 });
     }
 };
