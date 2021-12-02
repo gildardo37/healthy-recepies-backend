@@ -112,13 +112,17 @@ exports.updateUser = async (req, res) => {
             gender: req.body.gender
         };
         const token_info = TOKEN.tokenInfo(req, res);
-        const filter = { 
-            where: { id_user: token_info.id_user } 
-        }
+        const filter = { where: { id_user: token_info.id_user } }
         const data = await USER.update(user_data, filter);
-        console.log(data);
-        if(data[0] != 0) res.send( { message: "User updated correctly!" , status: 0 });
-        else res.status(404).send({ message: "Some error occurred while updating this user." , status: 1 });
+
+        if(data[0] === 0) {
+            return res.status(404).send({ message: "Some error occurred while updating this user." , status: 1 });
+        }
+        
+        const update = await updateHealth(token_info, res);
+        console.log("update", update);
+        if(update) return res.send( { message: "User updated correctly!" , status: 0 });
+        else return res.status(404).send({ message: "Some error occurred while updating this user." , status: 1 });
     } 
     catch (error) {
         console.log(error);
@@ -151,6 +155,27 @@ const insertHealth = async (params, res) => {
     catch (error) {
         console.log(error);
         return res.status(500).send( { message: "Some error occurred while creating this user. Try again.", status: 1 });
+    }
+}
+
+const updateHealth = async (token, res) => {
+    try {
+        const user = await USER.findOne({ where: { id_user: token.id_user } });
+        console.log("user", user);
+        const health = await HEALTH.update(
+            {
+                calories: calculateCalories(user),
+                imc: caluclateImc(user.height, user.weight)
+            },
+            { where: { id_health: user.fk_health } }
+        );
+
+        if(health[0] != 0) return true;
+        return false;
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).send( { message: "Some error occurred while updating this user. Try again.", status: 1 });
     }
 }
 

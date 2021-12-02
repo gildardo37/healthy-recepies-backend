@@ -103,19 +103,20 @@ exports.getRandomMeal = async (req, res) => {
 exports.deleteMeal = async (req, res) => {
     try {
         const { id_meal } = req.params;
+        const user_info = await TOKEN.tokenInfo(req, res);
         const all_meals = await MEALS.destroy({ where: { fk_my_meal: id_meal } });
 
         if(all_meals === 0){
             return res.status(500).send({ message: "Couldn't delete this meal, please try again ", status: 1 });
         }
         
-        const my_meal = await MY_MEALS.destroy({ where: { id_my_meal: id_meal } });
+        const my_meal = await MY_MEALS.destroy({ where: { id_my_meal: id_meal, fk_user: user_info.id_user } });
         
         if(my_meal !== 0) res.send({ message: "Meal deleted successfully", status: 0 });
         else res.status(500).send({ message: "Couldn't delete this meal, please try again ", status: 1 });
     } 
     catch (error) {
         console.log(error);
-        res.status(500).send( { message: error.message || "Some error occurred while retrieving your meals.", status: 1 });
+        res.status(500).send( { message: error.message || "Some error occurred while deleting this meal.", status: 1 });
     }
 };
