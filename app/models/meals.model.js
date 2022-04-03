@@ -1,45 +1,45 @@
 const Sequelize = require("sequelize");
-const connection = require("../../config/db.connection");
+const connection = require("../config/db.connection");
 
 module.exports = (connection, Sequelize) => {
-  const users = connection.define(
-    "users",
+  const meals = connection.define(
+    "meals",
     {
-      id_user: {
+      id_meal: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      name: {
+      id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      title: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
+      ready_in_minutes: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      password: {
+      image: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      date_of_birth: {
-        type: Sequelize.DATEONLY,
-        allowNull: false,
-      },
-      height: {
+      servings: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      weight: {
+      checked: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+      type: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      gender: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      fk_health: {
+      fk_my_meal: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
@@ -47,5 +47,5 @@ module.exports = (connection, Sequelize) => {
     { timestamps: false }
   );
 
-  return users;
+  return meals;
 };

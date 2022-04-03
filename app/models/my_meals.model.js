@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const connection = require("../../config/db.connection");
+const connection = require("../config/db.connection");
 
 module.exports = (connection, Sequelize) => {
   const my_meals = connection.define(

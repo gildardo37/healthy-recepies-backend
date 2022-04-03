@@ -4,9 +4,9 @@ const {
   sendMessage,
   currentDate,
   compareDates,
-} = require("../../_shared/helpers");
-const TOKEN = require("../../_shared/token");
-const DB = require("../../config/db.connection");
+} = require("../_shared/helpers");
+const TOKEN = require("../_shared/token");
+const DB = require("../config/db.connection");
 const MY_MEALS = DB.my_meals;
 const MEALS = DB.meals;
 const OP = DB.Sequelize.Op;

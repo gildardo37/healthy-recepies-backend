@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const users = require("../../controllers/users/users.controller");
-const token = require("../../_shared/token");
+const users = require("../controllers/users.controller");
+const token = require("../_shared/token");
 
 //get users
 router.get("/getAll", token.verify, users.getUsers);

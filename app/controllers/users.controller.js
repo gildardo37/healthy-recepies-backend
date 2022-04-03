@@ -3,9 +3,9 @@ const {
   sendError,
   sendMessage,
   calculateAge,
-} = require("../../_shared/helpers");
-const TOKEN = require("../../_shared/token");
-const DB = require("../../config/db.connection");
+} = require("../_shared/helpers");
+const TOKEN = require("../_shared/token");
+const DB = require("../config/db.connection");
 const USER = DB.users;
 const HEALTH = DB.health;
 const OP = DB.Sequelize.Op;
