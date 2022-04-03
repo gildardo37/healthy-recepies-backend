@@ -1,3 +1,4 @@
+const { sendData, sendError, sendMessage } = require("../../_shared/helpers");
 const TOKEN = require("../../_shared/token");
 const DB = require("../../config/db.connection");
 const USER = DB.users;
@@ -23,13 +24,10 @@ exports.getUsers = async (req, res) => {
         attributes: ["calories", "imc"],
       },
     });
-    res.send({ data: data, status: 0 });
+    sendData(res, data, 0);
   } catch (error) {
     console.log(error);
-    res.status(500).send({
-      message: "Some error occurred while retrieving users.",
-      status: 1,
-    });
+    sendError(res, "Some error occurred while retrieving users.", 1);
   }
 };
 
@@ -42,10 +40,7 @@ exports.login = async (req, res) => {
     });
 
     if (query == null) {
-      res
-        .status(404)
-        .send({ message: "Wrong user or password, try again.", status: 1 });
-      return;
+      return sendMessage(res, "Wrong user or password, try again.", 1);
     }
 
     const token_data = {
@@ -57,10 +52,7 @@ exports.login = async (req, res) => {
     const data = await TOKEN.create(token_data, "5d");
     res.send({ token: data });
   } catch (error) {
-    res.status(500).send({
-      message: "Some error occurred while retrieving users.",
-      status: 1,
-    });
+    sendError(res, "Some error occurred while logging in.", 1);
   }
 };
 
@@ -68,18 +60,18 @@ exports.login = async (req, res) => {
 exports.registerUser = async (req, res) => {
   try {
     const verify_email = await userExists(req.body.email);
-    if (verify_email)
-      return res.status(404).send({
-        message: "This email already exists, please use another email.",
-        status: 1,
-      });
+
+    if (verify_email) return sendMessage(res, "This email already exists.", 1);
 
     const health = await insertHealth(req.body, res);
-    if (!health)
-      return res.status(404).send({
-        message: "Some error occurred while creating this user. Try again.",
-        status: 1,
-      });
+
+    if (!health) {
+      return sendMessage(
+        res,
+        "Some error occurred while creating this user.",
+        1
+      );
+    }
 
     const data = await USER.create({
       name: req.body.name,
