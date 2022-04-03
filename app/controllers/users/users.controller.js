@@ -1,4 +1,9 @@
-const { sendData, sendError, sendMessage } = require("../../_shared/helpers");
+const {
+  sendData,
+  sendError,
+  sendMessage,
+  calculateAge,
+} = require("../../_shared/helpers");
 const TOKEN = require("../../_shared/token");
 const DB = require("../../config/db.connection");
 const USER = DB.users;
@@ -122,12 +127,9 @@ exports.profile = async (req, res) => {
       where: { id_user: token_info.id_user },
     });
 
-    if (data === null)
-      res.status(404).send({
-        message:
-          "This user doesn't exists or you don't have permission to this information.",
-        status: 1,
-      });
+    if (data === null) sendMessage(res, "This user info is not available.", 1);
+
+    data.dataValues.age = calculateAge(data.dataValues.date_of_birth);
     res.send({ data: data, status: 0 });
   } catch (error) {
     res.status(500).send({
@@ -152,26 +154,20 @@ exports.updateUser = async (req, res) => {
     const filter = { where: { id_user: token_info.id_user } };
     const data = await USER.update(user_data, filter);
     if (data[0] === 0) {
-      return res.status(404).send({
-        message: "Some error occurred while updating this user.",
-        status: 1,
-      });
+      return sendMessage(res, "Couldn't update this user info.", 1);
     }
 
     const update = await updateHealth(token_info, res);
-    if (update)
-      return res.send({ message: "User updated correctly!", status: 0 });
+    if (update) return sendMessage(res, "User updated correctly!", 0);
     else
-      return res.status(404).send({
-        message: "Some error occurred while updating this user.",
-        status: 1,
-      });
+      return sendMessage(
+        res,
+        "Some error occurred while updating this user.",
+        1
+      );
   } catch (error) {
     console.log(error);
-    res.status(500).send({
-      message: "Some error occurred while updating this user.",
-      status: 1,
-    });
+    sendError(res, error.message, 1);
   }
 };
 
@@ -189,18 +185,11 @@ exports.changePassword = async (req, res) => {
     const data = await USER.update(user_data, filter);
 
     if (data[0] === 0) {
-      return res.status(404).send({
-        message: "Old password is incorrect.",
-        status: 1,
-      });
-    } else
-      return res.send({ message: "Password updated correctly!", status: 0 });
+      return sendMessage(res, "Old password is incorrect.", 1);
+    } else return sendMessage(res, "Password updated correctly!", 0);
   } catch (error) {
     console.log(error);
-    res.status(500).send({
-      message: "Error while changing this password.",
-      status: 1,
-    });
+    return sendError(res, error.message, 1);
   }
 };
 
@@ -217,6 +206,7 @@ const userExists = async (email) => {
 
 const insertHealth = async (params, res) => {
   try {
+    console.log(params);
     const health = await HEALTH.create({
       calories: calculateCalories(params),
       imc: caluclateImc(params.height, params.weight),
@@ -226,10 +216,7 @@ const insertHealth = async (params, res) => {
     return false;
   } catch (error) {
     console.log(error);
-    return res.status(500).send({
-      message: "Some error occurred while creating this user. Try again.",
-      status: 1,
-    });
+    return sendError(res, error.message, 1);
   }
 };
 
@@ -247,10 +234,7 @@ const updateHealth = async (token, res) => {
     return true;
   } catch (error) {
     console.log(error);
-    return res.status(500).send({
-      message: "Some error occurred while updating this user. Try again.",
-      status: 1,
-    });
+    return sendError(res, error.message, 1);
   }
 };
 
@@ -260,7 +244,8 @@ const caluclateImc = (height, weight) => {
 };
 
 const calculateCalories = (params) => {
-  const { weight, height, age, gender } = params;
+  const { weight, height, date_of_birth, gender } = params;
+  const age = calculateAge(date_of_birth);
   if (gender.toLowerCase() === "male") {
     return 66 + 13.7 * weight + (5 * height - 6.8 * age) * 1.55;
   } else {

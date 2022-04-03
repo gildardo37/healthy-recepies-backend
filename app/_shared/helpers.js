@@ -49,6 +49,12 @@ exports.compareDates = () => {
   return { startDay, endDay };
 };
 
+exports.calculateAge = (birth_date) => {
+  const from = birth_date.split("-");
+  const birthdateTimeStamp = new Date(from[0], from[1] - 1, from[2]);
+  return Math.floor((new Date() - birthdateTimeStamp) / 31557600000);
+};
+
 const today = new Date(
   new Date().toLocaleString("en-US", {
     timeZone: "America/Tijuana",
