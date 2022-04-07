@@ -3,6 +3,9 @@ const router = express.Router();
 const users = require("../controllers/users.controller");
 const token = require("../_shared/token");
 
+//validate token
+router.get("/validateToken", users.validateToken);
+
 //get users
 router.get("/getAll", token.verify, users.getUsers);
 

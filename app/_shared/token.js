@@ -42,7 +42,7 @@ exports.tokenInfo = (req, res) => {
       if (error) {
         res.status(401).send({
           message: "This token has expired or is incorrect.",
-          status: 0,
+          status: 1,
         });
         return;
       } else tokenData = data;

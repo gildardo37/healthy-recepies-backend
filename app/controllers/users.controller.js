@@ -193,6 +193,11 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+exports.validateToken = (req, res) => {
+  const data = TOKEN .tokenInfo(req, res);
+  sendData(res, data, 1);
+}
+
 const userExists = async (email) => {
   try {
     const data = await USER.findOne({ where: { email } });
