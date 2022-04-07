@@ -195,7 +195,7 @@ exports.changePassword = async (req, res) => {
 
 exports.validateToken = (req, res) => {
   const data = TOKEN .tokenInfo(req, res);
-  sendData(res, data, 1);
+  sendData(res, data, 0);
 }
 
 const userExists = async (email) => {
